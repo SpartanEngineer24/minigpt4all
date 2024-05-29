@@ -1,11 +1,11 @@
 model:
   arch: minigpt4
-  model_type: pretrain_vicuna0
+  model_type: pretrain_qwen_14
   max_txt_len: 160
-  end_sym: "###"
+  end_sym: "<|im_end|>"
   low_resource: True
-  prompt_template: '###Human: {} ###Assistant: '
-  ckpt: '/ibex/user/hansh/Models/minigpt4/minigpt4_vicuna.pth'
+  prompt_template: '<|im_start|>user\n{}<|im_end|>\n<|im_start|>assistant\n'
+  ckpt: '/ibex/user/hansh/Training/11_qwen_14_multi_larger/20240526212/checkpoint_22.pth'
 
 
 datasets:

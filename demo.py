@@ -12,7 +12,7 @@ from transformers import StoppingCriteriaList
 from minigpt4.common.config import Config
 from minigpt4.common.dist_utils import get_rank
 from minigpt4.common.registry import registry
-from minigpt4.conversation.conversation import Chat, CONV_VISION_Vicuna0, CONV_VISION_LLama2, StoppingCriteriaSub
+from minigpt4.conversation.conversation import Chat, CONV_VISION_Vicuna0, CONV_VISION_LLama2, CONV_VISION_Qwen, CONV_VISION_LLama3, StoppingCriteriaSub
 
 # imports modules for registration
 from minigpt4.datasets.builders import *
@@ -53,7 +53,10 @@ def setup_seeds(config):
 # ========================================
 
 conv_dict = {'pretrain_vicuna0': CONV_VISION_Vicuna0,
-             'pretrain_llama2': CONV_VISION_LLama2}
+             'pretrain_llama2': CONV_VISION_LLama2,
+             'pretrain_qwen': CONV_VISION_Qwen,
+             'pretrain_qwen_14': CONV_VISION_Qwen,
+             'pretrain_llama3': CONV_VISION_LLama3}
 
 print('Initializing Chat')
 args = parse_args()
@@ -168,4 +171,10 @@ with gr.Blocks() as demo:
     )
     clear.click(gradio_reset, [chat_state, img_list], [chatbot, image, text_input, upload_button, chat_state, img_list], queue=False)
 
-demo.launch(share=True, enable_queue=True)
+
+#remove the automatically opened ports from VSCode and open a new port witht he following;
+#ssh -L 7860:<GPU_NODE_NAME>:7860 hansh@ilogin.ibex.kaust.edu.sa
+#include serve_name='0.0.0.0'
+#demo.launch(share=True, server_name='0.0.0.0', enable_queue=True)
+#access via http://127.0.0.1:7860/
+demo.launch(share=True)

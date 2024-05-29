@@ -15,7 +15,7 @@ model:
   # generation configs
   prompt: ""
 
-  llama_model: "/ibex/user/hansh/Models/vicuna-7b"
+  llama_model: "/ibex/user/hansh/Models/Qwen1.5-7B-Chat"
 
 preprocess:
     vis_processor:

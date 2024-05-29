@@ -1,11 +1,11 @@
 model:
   arch: minigpt4
-  model_type: pretrain_vicuna0
+  model_type: pretrain_llama3
   max_txt_len: 160
-  end_sym: "###"
+  end_sym: "</s>"
   low_resource: True
-  prompt_template: '###Human: {} ###Assistant: '
-  ckpt: '/ibex/user/hansh/Models/minigpt4/minigpt4_vicuna.pth'
+  prompt_template: '<|start_header_id|>system<|end_header_id|> You are a helpful assistant. <|start_header_id|>user<|end_header_id|>: {} '
+  ckpt: '/ibex/user/hansh/Models/minigpt4/20240518205/checkpoint_3.pth'
 
 
 datasets:

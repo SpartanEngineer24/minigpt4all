@@ -4,6 +4,8 @@ import random
 import torch
 from torch.cuda.amp import autocast as autocast
 import torch.nn as nn
+import sys
+import json
 
 from minigpt4.common.registry import registry
 from minigpt4.models.base_model import BaseModel
@@ -56,7 +58,11 @@ class MiniGPTBase(BaseModel):
         self.max_context_len = max_context_len
         self.end_sym = end_sym
 
-        self.prompt_template = prompt_template
+        # Manually setting prompt_template for qwen model
+        # another stop-gap solution, needs integration
+        #!!!
+        if self.llama_model.__class__.__name__ == 'Qwen2ForCausalLM':
+            self.prompt_template = '<|im_start|> {} <|im_end|>'
         self.prompt_list = []
 
     def vit_to_cpu(self):
@@ -75,14 +81,31 @@ class MiniGPTBase(BaseModel):
             for i, seg in enumerate(prompt_segs)
         ]
         seg_embs = [self.embed_tokens(seg_t) for seg_t in seg_tokens]
-
         mixed_embs = [emb for pair in zip(seg_embs[:-1], img_list) for emb in pair] + [seg_embs[-1]]
         mixed_embs = torch.cat(mixed_embs, dim=1)
         return mixed_embs
 
     def prompt_wrap(self, img_embeds, atts_img, prompts, lengths=None):
+        # Preparing data to be saved
+        # data_to_save = {
+        #     "img_embeds": img_embeds.cpu().numpy().tolist() if img_embeds is not None else None,
+        #     "atts_img": atts_img.cpu().numpy().tolist() if atts_img is not None else None,
+        #     "prompts": prompts,
+        #     "lengths": lengths
+        # }
+        
+        # # Writing data to a file
+        # with open("/ibex/user/hansh/working_directory/input_data.json", "w") as file:
+        #     json.dump(data_to_save, file, indent=4)
+        # sys.exit(-99)
+
+        # torch.set_printoptions(threshold=float('inf'))
+        # print("!!!!!!!!!!!!!!!!!!")
+        # print(prompts)
+        # print("!!!!!!!!!!!!!!!!!!")
         if prompts is None or len(prompts) == 0:
             # prompts is not provided, just return the original image embedding
+            # print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
             return img_embeds, atts_img
         elif img_embeds is None:
             # prompt is provided but there is no image embedding. return the prompt embedding in right padding
@@ -95,32 +118,57 @@ class MiniGPTBase(BaseModel):
             ).to(self.device)
             prompt_embeds = self.embed_tokens(prompt_tokens.input_ids)
             atts_prompt = prompt_tokens.attention_mask
+            # print("BBBBBBBBBBBBBBBBBBBBBB")
+            # print(prompt_tokens)
+            # print("BBBBBBBBBBBBBBBBBBBBBB")
             return prompt_embeds, atts_prompt
         else:
             # return the multi-modal embedding in right padding
             emb_lists = []
             if isinstance(prompts, str):
-                prompts = [prompts] * len(img_embeds)
+                prompts = [prompts] * len(img_embeds) # prompt is a string and you want one string per image in your batch
+
 
             for idx, (each_img_embed, each_prompt) in enumerate(zip(img_embeds, prompts)):
+                # print("XXXXXXXXXXXXXXX")
+                # print(each_prompt)
+                # print("XXXXXXXXXXXXXXX")
+
                 pn = each_img_embed.shape[-2]
                 if lengths is not None:
                     each_img_embed = each_img_embed.reshape(-1, each_img_embed.shape[-1])
                     each_img_embed = each_img_embed[:lengths[idx] * pn]
                 p_segs = each_prompt.split('<ImageHere>')
                 interleave_emb = []
-                for idx, seg in enumerate(p_segs[:-1]):
-                    p_tokens = self.llama_tokenizer(
-                        seg, return_tensors="pt", add_special_tokens=False).to(img_embeds.device)
+
+                # !!!
+                # For when <ImageHere> is a non-existent token in p_segs
+                if len(p_segs) > 1:
+                    for seg_idx, seg in enumerate(p_segs[:-1]):
+                        p_tokens = self.llama_tokenizer(seg, return_tensors="pt", add_special_tokens=False).to(img_embeds.device)
+                        # print("???????????")
+                        # print(p_tokens)
+                        # print("???????????")
+                        p_embed = self.embed_tokens(p_tokens.input_ids)
+                        interleave_emb.append(torch.cat([p_embed, each_img_embed[None][:, seg_idx * pn:(seg_idx + 1) * pn]], dim=1))
+                    wrapped_emb = torch.cat(interleave_emb, dim=1)
+                else:
+                    p_tokens = self.llama_tokenizer(each_prompt, return_tensors="pt", add_special_tokens=False).to(img_embeds.device)
+                    # print("@@@@@@@@@@@@@@@@")
+                    # print(p_tokens)
+                    # print("@@@@@@@@@@@@@@@@")
                     p_embed = self.embed_tokens(p_tokens.input_ids)
-                    interleave_emb.append(torch.cat([p_embed, each_img_embed[None][:, idx * pn:(idx + 1) * pn]], dim=1))
-                wrapped_emb = torch.cat(interleave_emb, dim=1)
+                    if each_img_embed.dim() == 2:
+                        each_img_embed = each_img_embed.unsqueeze(0) # no idea if this is the correct approach, but it seems to work
+                    wrapped_emb = torch.cat([p_embed, each_img_embed], dim=1)
                 p_tokens = self.llama_tokenizer(
                     p_segs[-1], return_tensors="pt", add_special_tokens=False).to(img_embeds.device)
+                # print("$$$$$$$$$$$$$")
+                # print(p_tokens)
+                # print("$$$$$$$$$$$$$")
                 p_embed = self.embed_tokens(p_tokens.input_ids)
                 wrapped_emb = torch.cat([wrapped_emb, p_embed], dim=1)
-                emb_lists.append(wrapped_emb)
-
+                emb_lists.append(wrapped_emb)           
             emb_lens = [emb.shape[1] for emb in emb_lists]
             pad_emb = self.embed_tokens(torch.tensor(self.llama_tokenizer.pad_token_id, device=img_embeds.device))
 
@@ -205,7 +253,6 @@ class MiniGPTBase(BaseModel):
             targets[batch_idx, :cur_len] = targets_list[batch_idx][0, :max_len]
 
         to_regress_token_attn = (to_regress_token_ids != self.llama_tokenizer.pad_token_id).to(torch.int)
-
         return to_regress_token_ids, to_regress_token_attn, targets
 
     def preparing_embedding(self, samples):
@@ -215,16 +262,13 @@ class MiniGPTBase(BaseModel):
         else:
             img_embeds = img_atts = None
 
-        if 'conv_q' in samples:
-            # handeling conversation datasets
+        if 'conv_q' in samples:            
             conv_q, conv_a = samples['conv_q'], samples['conv_a']
-
+            
             connect_sym = samples['connect_sym'][0]
-            conv_q = [q.split(connect_sym)for q in conv_q]
+            conv_q = [q.split(connect_sym) for q in conv_q]
             conv_a = [a.split(connect_sym) for a in conv_a]
-
             conv_q = [[self.prompt_template.format(item) for item in items] for items in conv_q]
-
             cond_embeds, cond_atts = self.prompt_wrap(img_embeds, img_atts, [q[0] for q in conv_q])
             regress_token_ids, regress_atts, part_targets = self.tokenize_conversation(conv_q, conv_a)
 
@@ -301,8 +345,31 @@ class MiniGPTBase(BaseModel):
                 attention_mask=attention_mask,
                 return_dict=True,
                 labels=targets,
-                reduction=reduction
+                # reduction=reduction
             )
+            # check the loss value if output.loss.mean()
+            # TO DO: Pool if necessary!!!
+        # print("(((((((((((((((((((((((())))))))))))))))))))))))")
+        # predicted_token_ids = outputs.logits.argmax(dim=-1)
+        # predicted_tokens = self.llama_tokenizer.batch_decode(predicted_token_ids, skip_special_tokens=False)
+
+        # valid_target_ids = targets.clone()
+        # valid_target_ids[valid_target_ids == -100] = self.llama_tokenizer.pad_token_id
+        # target_tokens = self.llama_tokenizer.batch_decode(valid_target_ids, skip_special_tokens=False)
+
+        # length = input_lens[0].item()
+        # print("Input length: ", length)
+        # for i, (pred, target) in enumerate(zip(predicted_tokens, target_tokens)):
+        #     print(f"Sample {i}:")
+        #     print("Predicted Tokens:", pred)
+        #     print("Target Tokens:", target)
+        #     break
+        # print("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}")
+        # print(predicted_token_ids)
+        # print("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}")
+        # print(targets)
+        # print("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}")
+        # sys.exit(-99)
         loss = outputs.loss
 
         return {"loss": loss}
@@ -387,7 +454,6 @@ class MiniGPTBase(BaseModel):
             output_texts = output_texts.replace("<s>", "")
             output_texts = output_texts.split(r'[/INST]')[-1].strip()
             answers.append(output_texts)
-
         return answers
 
     @torch.no_grad()

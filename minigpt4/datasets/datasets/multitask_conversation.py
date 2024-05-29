@@ -69,7 +69,7 @@ class MultiTaskConversationDataset(Dataset):
         return {
             "image": image,
             "conv_q": questions,
-            'conv_a': answers,
+            "conv_a": answers,
             "image_id": info['id'],
             "connect_sym": self.connect_sym
         }

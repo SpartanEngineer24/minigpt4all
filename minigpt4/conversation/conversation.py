@@ -1,3 +1,4 @@
+import json
 import argparse
 import time
 from threading import Thread
@@ -33,7 +34,7 @@ class Conversation:
     sep2: str = None
 
     skip_next: bool = False
-    conv_id: Any = None
+    conv_id: str = None
 
     def get_prompt(self):
         if self.sep_style == SeparatorStyle.SINGLE:
@@ -45,11 +46,10 @@ class Conversation:
                     ret += role
             return ret
         elif self.sep_style == SeparatorStyle.TWO:
-            seps = [self.sep, self.sep2]
-            ret = self.system + seps[0]
+            ret = self.system + self.sep
             for i, (role, message) in enumerate(self.messages):
                 if message:
-                    ret += role + message + seps[i % 2]
+                    ret += role + message + self.sep2
                 else:
                     ret += role
             return ret
@@ -94,7 +94,6 @@ class Conversation:
 
 
 class StoppingCriteriaSub(StoppingCriteria):
-
     def __init__(self, stops=[], encounters=1):
         super().__init__()
         self.stops = stops
@@ -115,6 +114,19 @@ CONV_VISION_Vicuna0 = Conversation(
     offset=2,
     sep_style=SeparatorStyle.SINGLE,
     sep="###",
+    conv_id = "Vicuna",
+)
+
+CONV_VISION_Qwen = Conversation(
+    system="<|im_start|>system\nGive the following image: <Img>ImageContent</Img>. "
+           "You will be able to see the image once I provide it to you. Please answer my questions.<|im_end|>",
+    roles=("\n<|im_start|>user\n", "\n<|im_start|>assistant\n"),
+    messages=[],
+    offset=2,
+    sep_style=SeparatorStyle.TWO,
+    sep="",
+    sep2="<|im_end|>",
+    conv_id = "Qwen",
 )
 
 CONV_VISION_LLama2 = Conversation(
@@ -125,6 +137,18 @@ CONV_VISION_LLama2 = Conversation(
     offset=2,
     sep_style=SeparatorStyle.SINGLE,
     sep="",
+    conv_id = "Llama2",
+)
+
+CONV_VISION_LLama3 = Conversation(
+    system="Give the following image: <Img>ImageContent</Img>. "
+           "You will be able to see the image once I provide it to you. Please answer my questions.",
+    roles=(" <|start_header_id|>user<|end_header_id|> ", " <|start_header_id|>assistant<|end_header_id|> "),
+    messages=[],
+    offset=2,
+    sep_style=SeparatorStyle.SINGLE,
+    sep="",
+    conv_id = "Llama3",
 )
 
 CONV_VISION_minigptv2 = Conversation(
@@ -134,6 +158,7 @@ CONV_VISION_minigptv2 = Conversation(
     offset=2,
     sep_style=SeparatorStyle.SINGLE,
     sep="",
+    conv_id = "Minigptv2",
 )
 
 class Chat:

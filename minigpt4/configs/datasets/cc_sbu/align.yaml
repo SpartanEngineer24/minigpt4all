@@ -2,4 +2,4 @@ datasets:
   cc_sbu_align:
     data_type: images
     build_info:
-      storage: /path/to/cc_sbu_align/
+      storage: /ibex/project/c2133/blip_dataset/cc_sbu_align/

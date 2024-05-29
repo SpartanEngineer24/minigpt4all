@@ -19,6 +19,6 @@ datasets:
               - /path/to/vqav2/vqa_train.json
               - /path/to/vqav2/vqa_val.json
       images:
-          storage: /path/to/coco/images
+          storage: /ibex/project/c2090/faizan/LLaVA/playground/data/coco/train2017
 
   

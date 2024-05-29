@@ -1,21 +1,16 @@
 model:
   arch: minigpt4
 
-  # vit encoder
   image_size: 224
   drop_path_rate: 0
   use_grad_checkpoint: False
   vit_precision: "fp16"
   freeze_vit: True
-  freeze_qformer: True
+  has_qformer: False
 
-  # Q-Former
-  num_query_token: 32
-
-  # generation configs
   prompt: ""
 
-  llama_model: "/ibex/user/hansh/Models/vicuna-7b"
+  llama_model: "/ibex/ai/project/c2090/llama3/llama3/llama3/llama-3-8b-Instruct"
 
 preprocess:
     vis_processor:

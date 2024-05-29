@@ -18,7 +18,12 @@ from minigpt4.datasets.datasets.aok_vqa_datasets import AOKVQADataset
 from minigpt4.datasets.datasets.coco_vqa_datasets import COCOVQADataset
 from minigpt4.datasets.datasets.ocrvqa_dataset import OCRVQADataset
 from minigpt4.datasets.datasets.coco_caption import COCOCapDataset
-
+from minigpt4.datasets.datasets.coco_multi import COCOMultilingual
+from minigpt4.datasets.datasets.gqa_multi import GQAMultilingual
+from minigpt4.datasets.datasets.ocrvqa_multi import OCRVQAMultilingual
+from minigpt4.datasets.datasets.textvqa_multi import TextVqaMultilingual
+from minigpt4.datasets.datasets.vg_multi import VGMultilingual
+#from minigpt4.datasets.datasets.wit import WIT
 
 @registry.register_builder("multitask_conversation")
 class MultitaskConversationBuilder(BaseDatasetBuilder):
@@ -533,3 +538,149 @@ class CCSBUAlignBuilder(BaseDatasetBuilder):
         )
 
         return datasets
+
+@registry.register_builder("ocrvqa_multi")
+class OCRVQAMultiBuilder(DocumentVQABuilder):
+    train_dataset_cls = OCRVQAMultilingual
+
+    DATASET_CONFIG_DICT = {
+        "default": "configs/datasets/ocrvqa/ocrvqa_multilingual.yaml",
+    }
+    
+    def build_datasets(self):
+        logging.info("Building OCRVQA multi-language dataset...")
+        self.build_processors()
+        build_info = self.config.build_info
+        datasets = dict()
+
+        dataset_cls = self.train_dataset_cls
+        datasets['train'] = dataset_cls(
+            vis_processor=self.vis_processors["train"],
+            text_processor=self.text_processors["train"],
+            ann_path=build_info.ann_path,
+            vis_root=build_info.image_path,
+        )
+
+        return datasets
+
+@registry.register_builder("vg_multi")
+class VGMultiBuilder(BaseDatasetBuilder):
+    train_dataset_cls = VGMultilingual
+
+    DATASET_CONFIG_DICT = {
+        "default": "configs/datasets/vg/vg_multilingual.yaml",
+    }
+
+    def build_datasets(self):
+        logging.info("Building VG multi-language dataset...")
+        self.build_processors()
+        build_info = self.config.build_info
+        datasets = dict()
+
+        dataset_cls = self.train_dataset_cls
+        datasets['train'] = dataset_cls(
+            vis_processor=self.vis_processors["train"],
+            text_processor=self.text_processors["train"],
+            vis_root=build_info.image_path,
+            ann_path=build_info.ann_path
+        )
+
+        return datasets
+
+@registry.register_builder("gqa_multi")
+class GQAMultiBuilder(BaseDatasetBuilder):
+    train_dataset_cls = GQAMultilingual
+
+    DATASET_CONFIG_DICT = {
+        "default": "configs/datasets/gqa/gqa_multilingual.yaml",
+    }
+
+    def build_datasets(self):
+        logging.info("Building GQA multi-language dataset...")
+        self.build_processors()
+        build_info = self.config.build_info
+        datasets = dict()
+
+        dataset_cls = self.train_dataset_cls
+        datasets['train'] = dataset_cls(
+            vis_processor=self.vis_processors["train"],
+            text_processor=self.text_processors["train"],
+            ann_path=build_info.ann_path,
+            vis_root=build_info.image_path,
+        )
+
+        return datasets
+
+@registry.register_builder("coco_multi")
+class COCOMultiBuilder(BaseDatasetBuilder):
+    train_dataset_cls = COCOMultilingual
+
+    DATASET_CONFIG_DICT = {
+        "default": "configs/datasets/coco/coco_multilingual.yaml",
+    }
+
+    def build_datasets(self):
+        logging.info("Building COCO multi-language dataset...")
+        self.build_processors()
+        build_info = self.config.build_info
+        datasets = dict()
+
+        dataset_cls = self.train_dataset_cls
+        datasets['train'] = dataset_cls(
+            vis_processor=self.vis_processors["train"],
+            text_processor=self.text_processors["train"],
+            ann_path=build_info.ann_path,
+            vis_root=build_info.image_path,
+        )
+
+        return datasets
+
+@registry.register_builder("textvqa_multi")
+class TextVQAMultiBuilder(BaseDatasetBuilder):
+    train_dataset_cls = TextVqaMultilingual
+
+    DATASET_CONFIG_DICT = {
+        "default": "configs/datasets/textvqa/textvqa_multi.yaml",
+    }
+
+    def build_datasets(self):
+        logging.info("Building TextVQA multi-language dataset...")
+        self.build_processors()
+        build_info = self.config.build_info
+        datasets = dict()
+
+        dataset_cls = self.train_dataset_cls
+        datasets['train'] = dataset_cls(
+            vis_processor=self.vis_processors["train"],
+            text_processor=self.text_processors["train"],
+            ann_path=build_info.ann_path,
+            vis_root=build_info.image_path,
+        )
+
+        return datasets
+
+'''
+@registry.register_builder("wit")
+class WITBuilder(BaseDatasetBuilder):
+    train_dataset_cls = WIT
+
+    DATASET_CONFIG_DICT = {
+        "default": "configs/datasets/wit/wit.yaml",
+    }
+
+    def build_datasets(self):
+        logging.info("Building WIT dataset...")
+        self.build_processors()
+        build_info = self.config.build_info
+        datasets = dict()
+
+        dataset_cls = self.train_dataset_cls
+        datasets['train'] = dataset_cls(
+            vis_processor=self.vis_processors["train"],
+            text_processor=self.text_processors["train"],
+            ann_path=build_info.ann_path,
+            vis_root=build_info.image_path,
+        )
+
+        return datasets
+'''

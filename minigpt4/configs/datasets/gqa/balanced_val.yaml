@@ -18,4 +18,4 @@ datasets:
               - /path/to/gqa/train_balanced_questions.json
 
       images:
-          storage: /path/to/gqa/images
+          storage: /ibex/project/c2090/faizan/LLaVA/playground/data/gqa/images

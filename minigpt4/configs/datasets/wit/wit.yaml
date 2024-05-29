@@ -1,0 +1,6 @@
+datasets:
+  wit:
+    data_type: images
+    build_info:
+      image_path: /ibex/user/hansh/Datasets/WIT/images
+      ann_path: /ibex/user/hansh/Datasets/WIT/expanded_data.jsonl

@@ -13,7 +13,7 @@ from omegaconf import OmegaConf
 import numpy as np
 import torch
 import torch.nn as nn
-from transformers import LlamaTokenizer
+from transformers import AutoTokenizer, AutoModelForCausalLM
 from peft import (
     LoraConfig,
     get_peft_model,
@@ -24,7 +24,6 @@ from minigpt4.common.dist_utils import download_cached_file
 from minigpt4.common.utils import get_abs_path, is_url
 from minigpt4.models.eva_vit import create_eva_vit_g
 from minigpt4.models.modeling_llama import LlamaForCausalLM
-
 
 
 class BaseModel(nn.Module):
@@ -171,18 +170,27 @@ class BaseModel(nn.Module):
     def init_llm(cls, llama_model_path, low_resource=False, low_res_device=0, lora_r=0,
                  lora_target_modules=["q_proj","v_proj"], **lora_kargs):
         logging.info('Loading LLAMA')
-        llama_tokenizer = LlamaTokenizer.from_pretrained(llama_model_path, use_fast=False)
-        llama_tokenizer.pad_token = "$$"
+        llama_tokenizer = AutoTokenizer.from_pretrained(llama_model_path, use_fast=False)
+
+        #!!!!!!!!!!! very much a stop-gap solution, needs cleaning
+        if llama_tokenizer.bos_token:
+            # Standard llama2 tokenizer needs to be defined with pad tokens
+            llama_tokenizer.pad_token = "$$"
+        else:
+            # Qwen model tokenizer does not have defined bos token, so must be defined here
+            llama_tokenizer.pad_token = '<|endoftext|>'
+            llama_tokenizer.bos_token = '<|im_start|>'
+            llama_tokenizer.bos_token_id = 151644
 
         if low_resource:
-            llama_model = LlamaForCausalLM.from_pretrained(
+            llama_model = AutoModelForCausalLM.from_pretrained(
                 llama_model_path,
                 torch_dtype=torch.float16,
                 load_in_8bit=True,
                 device_map={'': low_res_device}
             )
         else:
-            llama_model = LlamaForCausalLM.from_pretrained(
+            llama_model = AutoModelForCausalLM.from_pretrained(
                 llama_model_path,
                 torch_dtype=torch.float16,
             )
