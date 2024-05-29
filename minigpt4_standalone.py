@@ -1504,7 +1504,7 @@ from tenacity import (
     stop_after_attempt,
     wait_random_exponential,
 )  # for exponential backoff
-openai.api_key = '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'
+openai.api_key = ''
 
 
 def prepare_chatgpt_message(task_prompt, paragraph):
