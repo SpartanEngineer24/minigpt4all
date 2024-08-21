@@ -1,0 +1,6 @@
+datasets:
+  cc_sbu_multi:
+    data_type: images
+    build_info:
+      image_path: /ibex/project/c2133/blip_dataset/cc_sbu_align/image
+      ann_path: /ibex/user/hansh/Datasets/cc_sbu_align_multi/cc_sbu_align_multi_output.jsonl

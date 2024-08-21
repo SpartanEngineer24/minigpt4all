@@ -1,0 +1,6 @@
+datasets:
+  cambrian_finetune:
+    data_type: images
+    build_info:
+      image_path: /ibex/project/c2090/datasets/Cambrian-10M
+      ann_path: /ibex/user/hansh/Datasets/Cambrian/cleave/data_with_image.jsonl

@@ -1,0 +1,6 @@
+datasets:
+  ocrvqa_multi:
+    data_type: images
+    build_info:
+      image_path: /ibex/project/c2090/faizan/LLaVA/playground/data/ocr_vqa/images
+      ann_path: /ibex/user/hansh/Datasets/PALO_training/ocr_vqa_images_newline.json

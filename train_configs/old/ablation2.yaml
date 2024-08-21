@@ -1,0 +1,104 @@
+model:
+  arch: minigpt4
+  model_type: pretrain_llama3
+  max_txt_len: 512
+  image_size: 224
+  end_sym: "<|end_of_text|>"
+  llama_model: "/ibex/user/hansh/Models/llama3-8b-instruct"
+  prompt_path: "/ibex/user/hansh/MiniGPT-4_multilingual/prompts/alignment.txt"
+  ckpt: "/ibex/user/hansh/Training/01_llama3_8b_finetune/20240603000/checkpoint_4.pth"
+  prompt_template: '<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n{}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n'
+  use_grad_checkpoint: True
+  chat_template: True
+  lora_r: 64
+  lora_alpha: 16
+
+datasets:
+  # coco_multi:
+  #   batch_size: 1
+  #   vis_processor:
+  #     train:
+  #       name: "blip2_image_train"
+  #       image_size: 224
+  #   text_processor:
+  #     train:
+  #       name: "blip_caption"
+  #   sample_ratio: 30
+
+  gqa_multi:
+    batch_size: 1
+    vis_processor:
+      train:
+        name: "blip2_image_train"
+        image_size: 224
+    text_processor:
+      train:
+        name: "blip_caption"
+    sample_ratio: 20
+
+  # ocrvqa_multi:
+  #   batch_size: 1
+  #   vis_processor:
+  #     train:
+  #       name: "blip2_image_train"
+  #       image_size: 224
+  #   text_processor:
+  #     train:
+  #       name: "blip_caption"
+  #   sample_ratio: 10
+
+  # vg_multi:
+  #   batch_size: 1
+  #   vis_processor:
+  #     train:
+  #       name: "blip2_image_train"
+  #       image_size: 224
+  #   text_processor:
+  #     train:
+  #       name: "blip_caption"
+  #   sample_ratio: 10
+
+  # textvqa_multi:
+  #   batch_size: 1
+  #   vis_processor:
+  #     train:
+  #       name: "blip2_image_train"
+  #       image_size: 224
+  #   text_processor:
+  #     train:
+  #       name: "blip_caption"
+  #   sample_ratio: 10  
+
+run:
+  task: image_text_pretrain
+  lr_sched: "linear_warmup_cosine_lr"
+  init_lr: 5e-6
+  min_lr: 5e-7
+  warmup_lr: 5e-7
+
+  weight_decay: 0.001
+  max_epoch: 30
+  num_workers: 4
+  warmup_steps: 2000
+  iters_per_epoch: 2000
+
+  # Added this on top of batching
+  accum_grad_iters: 8
+
+  seed: 42
+  output_dir: "/ibex/user/hansh/Training/ablation2"
+
+  amp: True
+  resume_ckpt_path: null
+
+  evaluate: False 
+  train_splits: ["train"]
+
+  device: "cuda"
+  world_size: 1
+  dist_url: "env://"
+  distributed: True
+  gpu: 0
+
+  wandb_log: False
+  job_name: _

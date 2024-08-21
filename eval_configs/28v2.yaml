@@ -1,0 +1,23 @@
+model:
+  arch: minigpt4
+  model_type: pretrain_llama3
+  max_txt_len: 512
+  end_sym: "<|eot_id|>"
+  image_size: 224
+  low_resource: False
+  prompt_template: '<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n{}<|eot_id|><|start_header_id|>assistant<|end_header_id|>'
+  ckpt: '/ibex/user/hansh/Training/28v2/20240724202/checkpoint_7.pth'
+
+
+datasets:
+  cc_sbu_align:
+    vis_processor:
+      train:
+        name: "blip2_image_eval"
+        image_size: 224
+    text_processor:
+      train:
+        name: "blip_caption"
+
+run:
+  task: image_text_pretrain

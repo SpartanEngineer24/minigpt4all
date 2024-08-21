@@ -1,0 +1,5 @@
+datasets:
+  cambrian_text_finetune:
+    data_type: text
+    build_info:
+      ann_path: /ibex/user/hansh/Datasets/Cambrian/cleave/10M_data_without_image.jsonl

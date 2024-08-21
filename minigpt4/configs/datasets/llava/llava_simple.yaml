@@ -1,0 +1,6 @@
+datasets:
+  llava_simple:
+    data_type: images
+    build_info:
+      image_path: /ibex/ai/project/c2090/datasets/Cambrian-10M
+      ann_path: /ibex/user/hansh/Datasets/LLaVA-Instruct/llava_v1_5_img.json

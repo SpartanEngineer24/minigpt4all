@@ -1,0 +1,6 @@
+datasets:
+  cambrian_text:
+    data_type: images
+    build_info:
+      image_path: /ibex/ai/project/c2090/datasets/Cambrian-10M
+      ann_path: /ibex/ai/project/c2090/datasets/Cambrian-10M/jsons/without_image.json
