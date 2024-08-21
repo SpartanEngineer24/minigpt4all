@@ -1,6 +1,0 @@
-datasets:
-  coco_multi:
-    data_type: images
-    build_info:
-      image_path: /ibex/project/c2090/faizan/LLaVA/playground/data/coco/train2017
-      ann_path: /ibex/user/hansh/Datasets/PALO_training/coco_train2017_newline.json

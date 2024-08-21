@@ -1,6 +1,0 @@
-datasets:
-  vg_multi:
-    data_type: images
-    build_info:
-      image_path: /ibex/project/c2090/faizan/LLaVA/playground/data/vg
-      ann_path: /ibex/user/hansh/Datasets/PALO_training/vg_VG_100K_newline.json

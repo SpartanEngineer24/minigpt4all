@@ -1,7 +1,0 @@
-datasets:
-  laion:
-    data_type: images
-    build_info:
-      storage: /ibex/project/c2133/blip_dataset/laion2B_multi/laion2b_multi/{00000..10488}.tar
-#/ibex/project/c2133/blip_dataset/laion_1b/laion_update/{00000..10488}.tar
-#/ibex/project/c2133/blip_dataset/laion2B_multi/laion2b_multi/{00000..10488}.tar

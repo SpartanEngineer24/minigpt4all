@@ -1,6 +1,0 @@
-datasets:
-  gqa_multi:
-    data_type: images
-    build_info:
-      image_path: /ibex/project/c2090/faizan/LLaVA/playground/data/gqa/images
-      ann_path: /ibex/user/hansh/Datasets/PALO_training/gqa_images_newline.json

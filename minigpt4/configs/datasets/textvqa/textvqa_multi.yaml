@@ -1,6 +1,0 @@
-datasets:
-  textvqa_multi:
-    data_type: images
-    build_info:
-      image_path: /ibex/project/c2090/faizan/LLaVA/playground/data/textvqa/train_images
-      ann_path: /ibex/user/hansh/Datasets/PALO_training/textvqa_train_images_newline.json
