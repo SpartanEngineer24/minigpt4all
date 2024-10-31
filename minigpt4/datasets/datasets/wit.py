@@ -3,6 +3,7 @@ import json
 import random
 from PIL import Image
 from torch.utils.data import Dataset
+from langcodes import Language
 
 class WIT(Dataset):
     def __init__(self, vis_processor, text_processor, vis_root, ann_path):
@@ -63,4 +64,39 @@ class WIT(Dataset):
             "image": image,
             "instruction_input": question,
             "answer": answer,
+        }
+
+class WITText(Dataset):
+    def __init__(self, vis_processor, text_processor, vis_root, ann_path):
+        self.vis_root = vis_root        
+        self.vis_processor = vis_processor
+        self.text_processor = text_processor
+        self.entries = []
+        with open(ann_path, 'r') as file:
+            for line in file:
+                self.entries.append(json.loads(line.strip()))
+        
+        self.question_templates = [
+            "First half of a wikipedia article in {language} is as follows: '{first_half}'. Generate the second half",
+            "Given the first part of the Wikipedia passage in {language}, complete it: '{first_half}'",
+            "Here is a truncated Wikipedia article in {language}: '{first_half}'. Please continue the article.",
+            "This is a part of a Wikipedia article in {language}: '{first_half}'. Give a possible completion of it.",
+            "Finish the following text, retrieved in part from Wikipedia: '{first_half}'. Answer in {language}."
+        ]
+
+    def __len__(self):
+        return len(self.entries)
+
+    def __getitem__(self, idx):
+        entry = self.entries[idx]
+        language_code = entry['language']
+        
+        language = Language.get(language_code).display_name()
+
+        question_template = random.choice(self.question_templates)
+        question = question_template.format(first_half=entry['first_half'], language=language)
+
+        return {
+            "instruction_input": question,
+            "answer": entry['second_half']
         }

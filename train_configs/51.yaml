@@ -1,17 +1,10 @@
 model:
   arch: minigpt_v2
   model_type: pretrain_llama3
-  max_txt_len: 512
-  image_size: 224
   end_sym: "<|end_of_text|>"
-  llama_model: "/ibex/user/hansh/Models/llama3-8b-instruct"
-  prompt_path: "/ibex/user/hansh/MiniGPT-4_multilingual/prompts/alignment.txt"
-  ckpt: "/ibex/user/hansh/Training/01_llama3_8b_finetune/20240603000/checkpoint_4.pth"
   prompt_template: '<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n{}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n'
-  use_grad_checkpoint: True
-  chat_template: True
-  lora_r: 64
-  lora_alpha: 16
+  max_txt_len: 1024
+  image_size: 448
 
 datasets:
   coco_multi:
@@ -19,7 +12,7 @@ datasets:
     vis_processor:
       train:
         name: "blip2_image_train"
-        image_size: 224
+        image_size: 448
     text_processor:
       train:
         name: "blip_caption"
@@ -30,7 +23,7 @@ datasets:
     vis_processor:
       train:
         name: "blip2_image_train"
-        image_size: 224
+        image_size: 448
     text_processor:
       train:
         name: "blip_caption"
@@ -41,7 +34,7 @@ datasets:
     vis_processor:
       train:
         name: "blip2_image_train"
-        image_size: 224
+        image_size: 448
     text_processor:
       train:
         name: "blip_caption"
@@ -52,7 +45,7 @@ datasets:
     vis_processor:
       train:
         name: "blip2_image_train"
-        image_size: 224
+        image_size: 448
     text_processor:
       train:
         name: "blip_caption"
@@ -63,30 +56,81 @@ datasets:
     vis_processor:
       train:
         name: "blip2_image_train"
-        image_size: 224
+        image_size: 448
     text_processor:
       train:
         name: "blip_caption"
-    sample_ratio: 10  
+    sample_ratio: 10
+
+  llava_multi:
+    batch_size: 1
+    vis_processor:
+      train:
+        name: "blip2_image_train"
+        image_size: 448
+    text_processor:
+      train:
+        name: "blip_caption"
+    sample_ratio: 30
+
+  laion:
+    batch_size: 2
+    vis_processor:
+      train:
+        name: "blip2_image_train"
+        image_size: 448
+    text_processor:
+      train:
+        name: "blip_caption"
+    sample_ratio: 185
+
+  cc_sbu:
+    batch_size: 2
+    vis_processor:
+        train:
+          name: "blip2_image_train"
+          image_size: 448
+    text_processor:
+        train:
+          name: "blip_caption"
+    sample_ratio: 25
+
+  cambrian:
+    batch_size: 1
+    vis_processor:
+      train:
+        name: "blip2_image_train"
+        image_size: 448
+    text_processor:
+      train:
+        name: "blip_caption"
+    sample_ratio: 105
+
+  cambrian_text:
+    batch_size: 1
+    text_processor:
+      train:
+        name: "blip_caption"
+    sample_ratio: 210
 
 run:
   task: image_text_pretrain
   lr_sched: "linear_warmup_cosine_lr"
-  init_lr: 5e-6
-  min_lr: 5e-7
-  warmup_lr: 5e-7
+  init_lr: 1e-4
+  min_lr: 8e-5
+  warmup_lr: 1e-6
 
-  weight_decay: 0.001
-  max_epoch: 30
+  weight_decay: 0.05
+  max_epoch: 64
   num_workers: 4
-  warmup_steps: 2000
-  iters_per_epoch: 2000
+  warmup_steps: 5000
+  iters_per_epoch: 5000
 
   # Added this on top of batching
-  accum_grad_iters: 8
+  accum_grad_iters: 16
 
   seed: 42
-  output_dir: "/ibex/user/hansh/Training/DEL"
+  output_dir: "/ibex/user/hansh/Training/51"
 
   amp: True
   resume_ckpt_path: null
@@ -99,5 +143,5 @@ run:
   dist_url: "env://"
   distributed: True
 
-  wandb_log: False
-  job_name: nojob
+  wandb_log: True
+  job_name: run51

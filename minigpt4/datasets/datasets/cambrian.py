@@ -43,13 +43,6 @@ class Cambrian(Dataset):
         questions = self.connect_sym.join(questions)
         answers = self.connect_sym.join(answers)
 
-        # print("###################################")
-        # print(image_path)
-        # print(image)
-        # print(questions)
-        # print(answers)
-        # print("###################################")
-        # import sys; sys.exit(-1) 
         return {
             "image": image,
             "conv_q": questions,
@@ -58,48 +51,57 @@ class Cambrian(Dataset):
         }
 
 class Cambrian_Text(Dataset):
-    def __init__(self, vis_processor, text_processor, vis_root, ann_path):
-        self.vis_root = vis_root        
-        self.vis_processor = vis_processor
+    def __init__(self, vis_processor, text_processor, vis_root, ann_path, char_limit=8000):
+        self.vis_root = vis_root
         self.text_processor = text_processor
+        self.char_limit = char_limit  # Character limit for truncation
         with open(ann_path, 'r') as f:
             self.ann = json.load(f)        
-        self.connect_sym = "!@#"    
-    
-    def read_and_format_json(self, file_path):
-        json_array = []        # Open the file and read line by line
-        with open(file_path, 'r') as file:
-            for line in file:
-                # Parse each line as a JSON object and append it to the list
-                json_object = json.loads(line.strip())
-                json_array.append(json_object)        
-        return json_array
+        self.connect_sym = "!@#"
     
     def __len__(self):
         return len(self.ann)
     
     def __getitem__(self, index):
         info = self.ann[index]
-        first_instruction = info['conversations'][0]['value']
-        questions = [first_instruction]
+        conversations = info.get('conversations', [])
+        
+        questions = []
         answers = []
-        for i, item in enumerate(info["conversations"][1:]):
-            if i % 2 ==0:  # assistant
-                assistant_answer = item["value"]
-                answers.append(assistant_answer)
+        total_char = 0
+        
+        # Iterate over conversations and append question-answer pairs
+        # Assuming the first element is the initial question
+        for i in range(0, len(conversations), 2):
+            question = conversations[i].get('value', "").strip()
+            answer = ""
+            if i + 1 < len(conversations):
+                answer = conversations[i + 1].get('value', "").strip()
+            
+            pair_q = question
+            pair_a = answer
+            pair_total = len(pair_q) + len(pair_a)
+            
+            if total_char + pair_total > self.char_limit:
+                if not questions and not answers:
+                    # print("EXCEEDING LIMIT: ", total_char + pair_total)
+                    return {
+                        "conv_q": self.connect_sym,
+                        'conv_a': self.connect_sym,
+                        "connect_sym": self.connect_sym
+                    }
+                else:
+                    break
             else:
-                human_instruction = item["value"]+" "
-                questions.append(human_instruction)        
-                
-        questions = self.connect_sym.join(questions)
-        answers = self.connect_sym.join(answers)
-        # print("###################################")
-        # print(questions)
-        # print(answers)
-        # print("###################################")
-        # import sys; sys.exit(-1)
+                questions.append(pair_q)
+                answers.append(pair_a)
+                total_char += pair_total
+        
+        truncated_questions = self.connect_sym.join(questions)
+        truncated_answers = self.connect_sym.join(answers)
+        
         return {
-            "conv_q": questions,
-            'conv_a': answers,
+            "conv_q": truncated_questions,
+            'conv_a': truncated_answers,
             "connect_sym": self.connect_sym
         }

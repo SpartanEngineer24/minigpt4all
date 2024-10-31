@@ -24,12 +24,13 @@ from minigpt4.datasets.datasets.ocrvqa_multi import OCRVQAMultilingual
 from minigpt4.datasets.datasets.textvqa_multi import TextVqaMultilingual
 from minigpt4.datasets.datasets.vg_multi import VGMultilingual
 from minigpt4.datasets.datasets.cc_sbu_multi import CCSBUMulti
-from minigpt4.datasets.datasets.wit import WIT
+from minigpt4.datasets.datasets.wit import WIT, WITText
 from minigpt4.datasets.datasets.cambrian import Cambrian, Cambrian_Text
 from minigpt4.datasets.datasets.llava_multi import Llava_Multi
 from minigpt4.datasets.datasets.llava_simple import Llava_Simple
 from minigpt4.datasets.datasets.xstorycloze import XStoryCloze
 from minigpt4.datasets.datasets.artelingo import ArtelingoMulti
+from minigpt4.datasets.datasets.flores import Flores
 
 @registry.register_builder("multitask_conversation")
 class MultitaskConversationBuilder(BaseDatasetBuilder):
@@ -713,6 +714,30 @@ class WITBuilder(BaseDatasetBuilder):
 
         return datasets
 
+@registry.register_builder("wit_text")
+class WITBuilder(BaseDatasetBuilder):
+    train_dataset_cls = WITText
+
+    DATASET_CONFIG_DICT = {
+        "default": "configs/datasets/wit/wit_text.yaml",
+    }
+
+    def build_datasets(self):
+        logging.info("Building WIT Text dataset...")
+        self.build_processors()
+        build_info = self.config.build_info
+        datasets = dict()
+
+        dataset_cls = self.train_dataset_cls
+        datasets['train'] = dataset_cls(
+            vis_processor=self.vis_processors["train"],
+            text_processor=self.text_processors["train"],
+            ann_path=build_info.ann_path,
+            vis_root=build_info.image_path,
+        )
+
+        return datasets
+
 @registry.register_builder("cambrian")
 class CambrainBuilder(BaseDatasetBuilder):
     train_dataset_cls = Cambrian
@@ -741,7 +766,26 @@ class CambrainTextBuilder(BaseDatasetBuilder):
         "default": "configs/datasets/cambrian/cambrian_text.yaml",
     }    
     def build_datasets(self):
-        # at this point, all the annotations and image/videos should be all downloaded to the specified locations.
+        logging.info("Building Cambrian_Text dataset...")
+        self.build_processors()
+        build_info = self.config.build_info
+        datasets = dict()        # create datasets
+        dataset_cls = self.train_dataset_cls
+        datasets['train'] = dataset_cls(
+            vis_processor=self.vis_processors["train"],
+            text_processor=self.text_processors["train"],
+            ann_path=build_info.ann_path,
+            vis_root=build_info.image_path,
+        )        
+        return datasets
+
+@registry.register_builder("cambrian_text_finetune")
+class CambrainTextBuilder(BaseDatasetBuilder):
+    train_dataset_cls = Cambrian_Text
+    DATASET_CONFIG_DICT = {
+        "default": "configs/datasets/cambrian/cambrian_text_finetune.yaml",
+    }    
+    def build_datasets(self):
         logging.info("Building Cambrian_Text dataset...")
         self.build_processors()
         build_info = self.config.build_info
@@ -846,4 +890,26 @@ class ArtelingoMultiBuilder(BaseDatasetBuilder):
             language=self.config.get("language", None),
         )
 
+        return datasets
+
+@registry.register_builder("flores")
+class FloresBuilder(BaseDatasetBuilder):
+    train_dataset_cls = Flores
+
+    DATASET_CONFIG_DICT = {
+        "default": "configs/datasets/flores/flores.yaml",
+    }
+
+    def build_datasets(self):
+        logging.info("Building Flores datasets...")
+        self.build_processors()
+        build_info = self.config.build_info
+        datasets = dict()
+        dataset_cls = self.train_dataset_cls
+        datasets['train'] = dataset_cls(
+            vis_processor=self.vis_processors["train"],
+            text_processor=self.text_processors["train"],
+            ann_path=build_info.ann_path,
+            vis_root=build_info.image_path,
+        )        
         return datasets

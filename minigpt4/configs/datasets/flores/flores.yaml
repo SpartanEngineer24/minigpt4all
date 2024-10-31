@@ -1,0 +1,6 @@
+datasets:
+  flores:
+    data_type: images
+    build_info:
+      image_path: /ibex/
+      ann_path: /ibex/user/hansh/Datasets/flores/flores200_full.jsonl

@@ -211,7 +211,6 @@ class BaseModel(nn.Module):
             llama_model = get_peft_model(llama_model, loraconfig)
 
             llama_model.print_trainable_parameters()
-
         else:
             print("freezing the llm")
             for name, param in llama_model.named_parameters():

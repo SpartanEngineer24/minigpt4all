@@ -6,7 +6,7 @@ model:
   end_sym: "<|end_of_text|>"
   llama_model: "/ibex/user/hansh/Models/llama3-8b-instruct"
   prompt_path: "/ibex/user/hansh/MiniGPT-4_multilingual/prompts/alignment.txt"
-  ckpt: "/ibex/user/hansh/Training/01_llama3_8b_finetune/20240603000/checkpoint_4.pth"
+  ckpt: "/ibex/user/hansh/Training/33v2/20241017150/checkpoint_7.pth"
   prompt_template: '<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n{}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n'
   use_grad_checkpoint: True
   chat_template: True
@@ -14,7 +14,7 @@ model:
   lora_alpha: 16
 
 datasets:
-  coco_multi:
+  cambrian:
     batch_size: 1
     vis_processor:
       train:
@@ -23,9 +23,16 @@ datasets:
     text_processor:
       train:
         name: "blip_caption"
-    sample_ratio: 30
+    sample_ratio: 65
 
-  gqa_multi:
+  cambrian_text:
+    batch_size: 1
+    text_processor:
+      train:
+        name: "blip_caption"
+    sample_ratio: 65
+
+  wit_text:
     batch_size: 1
     vis_processor:
       train:
@@ -34,9 +41,20 @@ datasets:
     text_processor:
       train:
         name: "blip_caption"
-    sample_ratio: 20
+    sample_ratio: 110
 
-  ocrvqa_multi:
+  flores:
+    batch_size: 1
+    vis_processor:
+      train:
+        name: "blip2_image_train"
+        image_size: 224
+    text_processor:
+      train:
+        name: "blip_caption"
+    sample_ratio: 65
+
+  xstorycloze:
     batch_size: 1
     vis_processor:
       train:
@@ -46,47 +64,25 @@ datasets:
       train:
         name: "blip_caption"
     sample_ratio: 10
-
-  vg_multi:
-    batch_size: 1
-    vis_processor:
-      train:
-        name: "blip2_image_train"
-        image_size: 224
-    text_processor:
-      train:
-        name: "blip_caption"
-    sample_ratio: 10
-
-  textvqa_multi:
-    batch_size: 1
-    vis_processor:
-      train:
-        name: "blip2_image_train"
-        image_size: 224
-    text_processor:
-      train:
-        name: "blip_caption"
-    sample_ratio: 10  
 
 run:
   task: image_text_pretrain
   lr_sched: "linear_warmup_cosine_lr"
-  init_lr: 5e-6
-  min_lr: 5e-7
-  warmup_lr: 5e-7
+  init_lr: 1e-5
+  min_lr: 1e-6
+  warmup_lr: 1e-6
 
-  weight_decay: 0.001
-  max_epoch: 30
-  num_workers: 4
+  weight_decay: 0.05
+  max_epoch: 32
+  num_workers: 6
   warmup_steps: 2000
   iters_per_epoch: 2000
 
   # Added this on top of batching
-  accum_grad_iters: 8
+  accum_grad_iters: 16
 
   seed: 42
-  output_dir: "/ibex/user/hansh/Training/DEL"
+  output_dir: "/ibex/user/hansh/Training/60"
 
   amp: True
   resume_ckpt_path: null
@@ -99,5 +95,5 @@ run:
   dist_url: "env://"
   distributed: True
 
-  wandb_log: False
-  job_name: nojob
+  wandb_log: True
+  job_name: run60

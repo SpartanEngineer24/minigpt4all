@@ -1,0 +1,180 @@
+model:
+  arch: minigpt_v2
+  model_type: pretrain_llama3
+  end_sym: "<|end_of_text|>"
+  prompt_template: '<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n{}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n'
+  max_txt_len: 1024
+  image_size: 448
+
+datasets:
+  coco_multi:
+    batch_size: 1
+    vis_processor:
+      train:
+        name: "blip2_image_train"
+        image_size: 448
+    text_processor:
+      train:
+        name: "blip_caption"
+    sample_ratio: 30
+
+  gqa_multi:
+    batch_size: 1
+    vis_processor:
+      train:
+        name: "blip2_image_train"
+        image_size: 448
+    text_processor:
+      train:
+        name: "blip_caption"
+    sample_ratio: 20
+
+  ocrvqa_multi:
+    batch_size: 1
+    vis_processor:
+      train:
+        name: "blip2_image_train"
+        image_size: 448
+    text_processor:
+      train:
+        name: "blip_caption"
+    sample_ratio: 10
+
+  vg_multi:
+    batch_size: 1
+    vis_processor:
+      train:
+        name: "blip2_image_train"
+        image_size: 448
+    text_processor:
+      train:
+        name: "blip_caption"
+    sample_ratio: 10
+
+  textvqa_multi:
+    batch_size: 1
+    vis_processor:
+      train:
+        name: "blip2_image_train"
+        image_size: 448
+    text_processor:
+      train:
+        name: "blip_caption"
+    sample_ratio: 10
+
+  llava_multi:
+    batch_size: 1
+    vis_processor:
+      train:
+        name: "blip2_image_train"
+        image_size: 448
+    text_processor:
+      train:
+        name: "blip_caption"
+    sample_ratio: 30
+
+  laion:
+    batch_size: 2
+    vis_processor:
+      train:
+        name: "blip2_image_train"
+        image_size: 448
+    text_processor:
+      train:
+        name: "blip_caption"
+    sample_ratio: 185
+
+  cc_sbu:
+    batch_size: 2
+    vis_processor:
+        train:
+          name: "blip2_image_train"
+          image_size: 448
+    text_processor:
+        train:
+          name: "blip_caption"
+    sample_ratio: 25
+
+  cambrian:
+    batch_size: 1
+    vis_processor:
+      train:
+        name: "blip2_image_train"
+        image_size: 448
+    text_processor:
+      train:
+        name: "blip_caption"
+    sample_ratio: 50
+
+  cambrian_text:
+    batch_size: 1
+    text_processor:
+      train:
+        name: "blip_caption"
+    sample_ratio: 105
+
+  wit_text:
+    batch_size: 1
+    vis_processor:
+      train:
+        name: "blip2_image_train"
+        image_size: 224
+    text_processor:
+      train:
+        name: "blip_caption"
+    sample_ratio: 50
+
+  flores:
+    batch_size: 1
+    vis_processor:
+      train:
+        name: "blip2_image_train"
+        image_size: 224
+    text_processor:
+      train:
+        name: "blip_caption"
+    sample_ratio: 30
+
+  xstorycloze:
+    batch_size: 1
+    vis_processor:
+      train:
+        name: "blip2_image_train"
+        image_size: 224
+    text_processor:
+      train:
+        name: "blip_caption"
+    sample_ratio: 10
+
+run:
+  task: image_text_pretrain
+  # optimizer
+  lr_sched: "linear_warmup_cosine_lr"
+  init_lr: 1e-4
+  min_lr: 8e-5
+  warmup_lr: 1e-6
+
+  weight_decay: 0.05
+  max_epoch: 64
+  num_workers: 4
+  warmup_steps: 5000
+  iters_per_epoch: 5000
+
+  accum_grad_iters: 8
+
+  seed: 42
+  output_dir: "/ibex/user/hansh/Training/58"
+
+  amp: True
+  resume_ckpt_path: /ibex/user/hansh/Training/v2_base/20240724134/checkpoint_3.pth
+
+  evaluate: False 
+  train_splits: ["train"]
+
+  device: "cuda"
+  world_size: 1
+  dist_url: "env://"
+  distributed: True
+
+  wandb_log: True
+  job_name: run58
