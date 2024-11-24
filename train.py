@@ -4,6 +4,9 @@
  SPDX-License-Identifier: BSD-3-Clause
  For full license text, see the LICENSE_Lavis file in the repo root or https://opensource.org/licenses/BSD-3-Clause
 """
+import warnings
+
+warnings.filterwarnings("ignore")
 
 import argparse
 import os

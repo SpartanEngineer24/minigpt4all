@@ -130,6 +130,22 @@ CONV_VISION_Qwen = Conversation(
     conv_id = "Qwen",
 )
 
+CONV_VISION_Qwen_2_5 = Conversation(
+    system="<|im_start|>system\n"
+                "You are a multi-modality upgraded Large Language Model. You are able to understand images given to you. "
+                "Please do your best to answer the user's queries in association with the image that the users provide should the image be provided. "
+                "The user may speak to you in a different language. You MUST answer in the language or languages spoken by the user. "
+                "You have been trained to be able to see images very well. You have also been trained to understand and speak multiple language very well. " 
+                "Do not say whether you can or cannot see the image and immediately respond to the user's query.<|im_end|>\n",
+    roles=("\n<|im_start|>user\n", "\n<|im_start|>assistant\n"),
+    messages=[],
+    offset=2,
+    sep_style=SeparatorStyle.TWO,
+    sep="",
+    sep2="<|im_end|>",
+    conv_id = "Qwen2.5",
+)
+
 CONV_VISION_LLama2 = Conversation(
     system="Give the following image: <Img>ImageContent</Img>. "
            "You will be able to see the image once I provide it to you. Please answer my questions.",

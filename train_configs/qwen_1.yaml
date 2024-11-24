@@ -1,12 +1,14 @@
 model:
   arch: minigpt_v2
-  model_type: pretrain_llama3_1
-  end_sym: "<|end_of_text|>"
-  prompt_template: '<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n{}<|end_of_text|><|start_header_id|>assistant<|end_header_id|>\n'
+  model_type: pretrain_qwen_2_5
+  end_sym: "<|endoftext|>"
+  prompt_template: '<|im_start|>user\n{}<|im_end|>\n<|im_start|>assistant\n'
+  max_txt_len: 1024
+  image_size: 448
 
 datasets:
   laion:
-    batch_size: 4
+    batch_size: 2
     vis_processor:
       train:
         name: "blip2_image_train"
@@ -15,16 +17,18 @@ datasets:
       train:
         name: "blip_caption"
     sample_ratio: 115
-  cc_sbu:
-    batch_size: 4
-    vis_processor:
-        train:
-          name: "blip2_image_train"
-          image_size: 448
-    text_processor:
-        train:
-          name: "blip_caption"
-    sample_ratio: 14
+
+  # cc_sbu:
+  #   batch_size: 2
+  #   vis_processor:
+  #       train:
+  #         name: "blip2_image_train"
+  #         image_size: 448
+  #   text_processor:
+  #       train:
+  #         name: "blip_caption"
+  #   sample_ratio: 14
+
 
 run:
   task: image_text_pretrain
@@ -35,18 +39,18 @@ run:
   warmup_lr: 1e-6
 
   weight_decay: 0.05
-  max_epoch: 32
-  num_workers: 32
+  max_epoch: 16
+  num_workers: 4
   warmup_steps: 5000
   iters_per_epoch: 5000
 
-  accum_grad_iters: 16
-
   seed: 42
-  output_dir: "/ibex/user/hansh/Training/62"
+  output_dir: "/ibex/user/hansh/Training/DEL"
 
   amp: True
   resume_ckpt_path: null
+
+  accum_grad_iters: 16
 
   evaluate: False 
   train_splits: ["train"]
@@ -57,4 +61,4 @@ run:
   distributed: True
 
   wandb_log: False
-  job_name: run62
+  job_name: _qwen_base

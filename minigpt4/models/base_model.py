@@ -166,8 +166,8 @@ class BaseModel(nn.Module):
 
     def init_llm(cls, llama_model_path, low_resource=False, low_res_device=0, lora_r=0,
                  lora_target_modules=["q_proj","v_proj"], **lora_kargs):
-        # import pdb; pdb.set_trace()
-        logging.info('Loading LLAMA')
+        
+        logging.info('Loading LLM')
         # Tokenizer initializations for different models
         if "aya23" in llama_model_path:
             llama_tokenizer = AutoTokenizer.from_pretrained(llama_model_path)
@@ -178,12 +178,21 @@ class BaseModel(nn.Module):
                 llama_tokenizer.pad_token = '<|endoftext|>'
                 llama_tokenizer.bos_token = '<|im_start|>'
                 llama_tokenizer.bos_token_id = 151644
-            if "llama" in llama_model_path:
+            elif "qwen2.5" in llama_model_path:
+                llama_tokenizer.bos_token = '<|im_start|>'
+                llama_tokenizer.bos_token_id = 151644
+            elif "llama" in llama_model_path:
                 llama_tokenizer.pad_token = "$$"
 
         if "llama3.1" in llama_model_path:
             llama_model = AutoModelForCausalLM.from_pretrained(
                 llama_model_path,
+                device_map="auto"
+            )
+        elif "qwen2.5" in llama_model_path:
+            llama_model = AutoModelForCausalLM.from_pretrained(
+                llama_model_path,
+                torch_dtype="auto",
                 device_map="auto"
             )
         elif low_resource:

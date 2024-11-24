@@ -264,26 +264,26 @@ class MiniGPTBase(BaseModel):
         return cond_embeds, cond_atts, regress_embeds, regress_atts, part_targets
 
     def forward(self, samples, reduction='mean'):
-        # prepare the embedding to condition and the embedding to regress
         cond_embeds, cond_atts, regress_embeds, regress_atts, part_targets = \
             self.preparing_embedding(samples)
 
-        # concat the embedding to condition and the embedding to regress
         inputs_embeds, attention_mask, input_lens = \
             self.concat_emb_input_output(cond_embeds, cond_atts, regress_embeds, regress_atts)
 
-        # get bos token embedding
         bos = torch.ones_like(part_targets[:, :1]) * self.llama_tokenizer.bos_token_id
         bos_embeds = self.embed_tokens(bos)
         bos_atts = cond_atts[:, :1]
 
-        # add bos token at the begining
         inputs_embeds = torch.cat([bos_embeds, inputs_embeds], dim=1)
         attention_mask = torch.cat([bos_atts, attention_mask], dim=1)
 
-        # ensemble the final targets
+        # Convert inputs_embeds to the same dtype as the model, if necessary
+        model_dtype = self.llama_model.dtype
+        if inputs_embeds.dtype != model_dtype:
+            inputs_embeds = inputs_embeds.to(model_dtype)
+
         targets = torch.ones([inputs_embeds.shape[0], inputs_embeds.shape[1]],
-                             dtype=torch.long).to(self.device).fill_(-100)
+                            dtype=torch.long).to(self.device).fill_(-100)
 
         for i, target in enumerate(part_targets):
             targets[i, input_lens[i]+1:input_lens[i]+len(target)+1] = target  # plus 1 for bos
@@ -299,6 +299,7 @@ class MiniGPTBase(BaseModel):
         loss = outputs.loss
 
         return {"loss": loss}
+
 
     def embed_tokens(self, token_ids):
         if hasattr(self.llama_model.base_model, 'model'): ## lora wrapped model

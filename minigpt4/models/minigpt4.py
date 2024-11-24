@@ -22,6 +22,7 @@ class MiniGPT4(MiniGPTBase):
         "pretrain_llama2": "configs/models/minigpt4_llama2.yaml",
         "pretrain_qwen": "configs/models/minigpt4_qwen.yaml",
         "pretrain_qwen_14": "configs/models/minigpt4_qwen_14.yaml",
+        "pretrain_qwen2_5": "configs/models/minigpt4_qwen_2_5.yaml",
         "pretrain_llama3": "configs/models/minigpt4_llama3.yaml",
         "pretrain_llama3_base": "configs/models/minigpt4_llama3_base.yaml",
         "pretrain_llama3_1": "configs/models/minigpt4_llama3_1.yaml",

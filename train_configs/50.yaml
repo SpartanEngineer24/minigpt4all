@@ -18,34 +18,34 @@ datasets:
         name: "blip_caption"
     sample_ratio: 115
 
-  cc_sbu:
-    batch_size: 1
-    vis_processor:
-        train:
-          name: "blip2_image_train"
-          image_size: 224
-    text_processor:
-        train:
-          name: "blip_caption"
-    sample_ratio: 15
+  # cc_sbu:
+  #   batch_size: 1
+  #   vis_processor:
+  #       train:
+  #         name: "blip2_image_train"
+  #         image_size: 224
+  #   text_processor:
+  #       train:
+  #         name: "blip_caption"
+  #   sample_ratio: 15
 
-  cambrian:
-    batch_size: 1
-    vis_processor:
-      train:
-        name: "blip2_image_train"
-        image_size: 224
-    text_processor:
-      train:
-        name: "blip_caption"
-    sample_ratio: 65
+  # cambrian:
+  #   batch_size: 1
+  #   vis_processor:
+  #     train:
+  #       name: "blip2_image_train"
+  #       image_size: 224
+  #   text_processor:
+  #     train:
+  #       name: "blip_caption"
+  #   sample_ratio: 65
 
-  cambrian_text:
-    batch_size: 1
-    text_processor:
-      train:
-        name: "blip_caption"
-    sample_ratio: 65
+  # cambrian_text:
+  #   batch_size: 1
+  #   text_processor:
+  #     train:
+  #       name: "blip_caption"
+  #   sample_ratio: 65
 
 run:
   task: image_text_pretrain
@@ -64,7 +64,7 @@ run:
   accum_grad_iters: 16
 
   seed: 42
-  output_dir: "/ibex/user/hansh/Training/50"
+  output_dir: "/ibex/user/hansh/Training/DEL"
 
   amp: True
   resume_ckpt_path: null
@@ -77,5 +77,5 @@ run:
   dist_url: "env://"
   distributed: True
 
-  wandb_log: True
+  wandb_log: False
   job_name: run50

@@ -8,7 +8,7 @@ import torch.nn as nn
 from minigpt4.common.registry import registry
 from minigpt4.models.base_model import disabled_train
 from minigpt4.models.minigpt_base import MiniGPTBase
-from minigpt4.models.Qformer import BertConfig, BertLMHeadModel
+from minigpt4.models.Qformer import BertConfig
 
 
 @registry.register_model("minigpt_v2")
@@ -21,6 +21,7 @@ class MiniGPTv2(MiniGPTBase):
         "pretrain": "configs/models/minigpt_v2.yaml",
         "pretrain_llama3": "configs/models/minigpt_v2_llama3.yaml",
         "pretrain_llama3_1": "configs/models/minigpt_v2_llama3_1.yaml",
+        "pretrain_qwen_2_5": "configs/models/minigpt4_qwen_2_5.yaml",
     }
 
     def __init__(

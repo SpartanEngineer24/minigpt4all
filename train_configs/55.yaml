@@ -7,7 +7,7 @@ model:
   llama_model: "/ibex/user/hansh/Models/llama3-8b-instruct"
   prompt_path: "/ibex/user/hansh/MiniGPT-4_multilingual/prompts/alignment.txt"
   ckpt: "/ibex/user/hansh/Training/34v2/20241017150/checkpoint_15.pth"
-  prompt_template: '<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n{}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n'
+  prompt_template: '<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n{}<|end_of_text|><|start_header_id|>assistant<|end_header_id|>\n'
   use_grad_checkpoint: True
   chat_template: True
   lora_r: 64

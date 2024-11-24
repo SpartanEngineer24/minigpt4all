@@ -2,7 +2,7 @@ model:
   arch: minigpt_v2
   model_type: pretrain_llama3_1
   end_sym: "<|end_of_text|>"
-  prompt_template: '<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n{}<|end_of_text|><|start_header_id|>assistant<|end_header_id|>\n'
+  prompt_template: '<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n{}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n'
 
 datasets:
   laion:
@@ -35,15 +35,15 @@ run:
   warmup_lr: 1e-6
 
   weight_decay: 0.05
-  max_epoch: 32
-  num_workers: 32
+  max_epoch: 64
+  num_workers: 64
   warmup_steps: 5000
   iters_per_epoch: 5000
 
   accum_grad_iters: 16
 
   seed: 42
-  output_dir: "/ibex/user/hansh/Training/62"
+  output_dir: "/ibex/user/hansh/Training/32"
 
   amp: True
   resume_ckpt_path: null
@@ -56,5 +56,5 @@ run:
   dist_url: "env://"
   distributed: True
 
-  wandb_log: False
-  job_name: run62
+  wandb_log: True
+  job_name: _32_
